@@ -36,7 +36,7 @@ If you only want a wallpaper change at GNOME start you can set it up at
 Dependencies
 ------------
 
- * Python 2.5
+ * Python 2.5 (it may or may not work in 2.4, but it's untested)
  * python-gconf
 
 Future features
@@ -45,7 +45,6 @@ Future features
 In no particular order:
 
  * Allow for recursive search of files.
- * Allow for multiple wallpaper directories.
  * Config file.
  * Create a GNOME applet.
  * Useful GUI.
