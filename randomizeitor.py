@@ -47,9 +47,13 @@ class Randomizeitor(object):
 
     def set_random_wallpaper(self):
         candidate_wallpapers = self.get_candidate_wallpapers()
-        the_chosen_one = random.choice(candidate_wallpapers)
-        self.set_wallpaper(the_chosen_one)
-        return the_chosen_one
+        if candidate_wallpapers:
+            the_chosen_one = random.choice(candidate_wallpapers)
+            self.set_wallpaper(the_chosen_one)
+            return the_chosen_one
+        else:
+            print u"No wallpapers found!"
+            return None
 
     def _remember_wallpaper(self, wallpaper):
         datafile = open(self.already_picked, "a")
@@ -70,27 +74,39 @@ class Randomizeitor(object):
         files = self.get_all_images()
         already_picked = self._already_picked()
         available_wallpapers = [w for w in files if w not in already_picked]
-        if not available_wallpapers: # every wallpaper showed once, reset
-            os.remove(self.already_picked)
-            available_wallpapers = self.get_candidate_wallpapers()
+        if files and not available_wallpapers: # every wallpaper showed once, reset
+            try:
+                os.remove(self.already_picked)
+                available_wallpapers = self.get_candidate_wallpapers()
+            except OSError, e:
+                print u"ERROR: %s, can't delete %s" % (e, self.already_picked)
         return available_wallpapers
 
     def get_all_images(self):
-        files = os.listdir(self.wallpaper_dir)
-        def filter_format(f):
-            full_path = os.path.abspath(os.path.join(self.wallpaper_dir, f))
-            mtype = mimetypes.guess_type(full_path)[0]
-            return mtype is not None and mtype.startswith('image/')
-        files = filter(filter_format, files)
-        files = [os.path.abspath(os.path.join(self.wallpaper_dir, f)) for f in files]
+        files = []
+        try:
+            files = os.listdir(self.wallpaper_dir)
+            def filter_format(f):
+                full_path = os.path.abspath(os.path.join(self.wallpaper_dir, f))
+                mtype = mimetypes.guess_type(full_path)[0]
+                return mtype is not None and mtype.startswith('image/')
+            files = filter(filter_format, files)
+            files = [os.path.abspath(os.path.join(self.wallpaper_dir, f)) for f in files]
+        except OSError, e:
+            print u"ERROR: %s, ignoring" % e
         return files
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print "Usage: python %s /path/to/wallpaper/directory/" % sys.argv[0]
+        print u"Usage: python %s /path/to/wallpaper/directory/" % sys.argv[0]
         sys.exit(0)
     wallpaper_dir = sys.argv[1]
-    client = Randomizeitor(wallpaper_dir)
-    chosen_wallpaper = client.set_random_wallpaper()
-    print "New wallpaper! %s" % chosen_wallpaper
+    try:
+        client = Randomizeitor(wallpaper_dir)
+        chosen_wallpaper = client.set_random_wallpaper()
+        if chosen_wallpaper is not None:
+            print u"New wallpaper! %s" % chosen_wallpaper
+    except RandomizeitorError, e:
+        print u"ERROR: %s" % e.message
+        sys.exit(1)
     sys.exit(0)
