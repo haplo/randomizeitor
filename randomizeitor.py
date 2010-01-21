@@ -27,11 +27,14 @@ class Randomizeitor(object):
     """Sets a new random wallpaper in GNOME picking it from a given
     collection and taken care not to repeat twice."""
 
-    def __init__(self, wallpaper_dir):
-        self._check_directory(wallpaper_dir)
+    def __init__(self, wallpaper_dirs):
+        assert(len(wallpaper_dirs) > 0)
+        for wallpaper_dir in wallpaper_dirs:
+            self._check_directory(wallpaper_dir)
         self._client = gconf.client_get_default()
-        self.wallpaper_dir = wallpaper_dir
-        self.already_picked = os.path.abspath(os.path.join(wallpaper_dir, '.randomizeitor'))
+        first_dir = wallpaper_dirs[0]
+        self.wallpaper_dirs = set([os.path.abspath(d) for d in wallpaper_dirs])
+        self.already_picked = os.path.join(first_dir, '.randomizeitor')
 
     def _check_directory(self, wallpaper_dir):
         if not os.path.isdir(wallpaper_dir):
@@ -83,26 +86,32 @@ class Randomizeitor(object):
         return available_wallpapers
 
     def get_all_images(self):
+        all_wallpapers = []
+        for wallpaper_dir in self.wallpaper_dirs:
+            all_wallpapers.extend(self.get_all_images_in_dir(wallpaper_dir))
+        return all_wallpapers
+
+    def get_all_images_in_dir(self, wallpaper_dir):
         files = []
         try:
-            files = os.listdir(self.wallpaper_dir)
+            files = os.listdir(wallpaper_dir)
             def filter_format(f):
-                full_path = os.path.abspath(os.path.join(self.wallpaper_dir, f))
+                full_path = os.path.abspath(os.path.join(wallpaper_dir, f))
                 mtype = mimetypes.guess_type(full_path)[0]
                 return mtype is not None and mtype.startswith('image/')
             files = filter(filter_format, files)
-            files = [os.path.abspath(os.path.join(self.wallpaper_dir, f)) for f in files]
+            files = [os.path.abspath(os.path.join(wallpaper_dir, f)) for f in files]
         except OSError, e:
             print u"ERROR: %s, ignoring" % e
         return files
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print u"Usage: python %s /path/to/wallpaper/directory/" % sys.argv[0]
+    if len(sys.argv) == 1:
+        print "Usage: python %s /path/to/wallpaper/directory/ [more paths ...]" % sys.argv[0]
         sys.exit(0)
-    wallpaper_dir = sys.argv[1]
+    wallpaper_dirs = sys.argv[1:]
     try:
-        client = Randomizeitor(wallpaper_dir)
+        client = Randomizeitor(wallpaper_dirs)
         chosen_wallpaper = client.set_random_wallpaper()
         if chosen_wallpaper is not None:
             print u"New wallpaper! %s" % chosen_wallpaper
