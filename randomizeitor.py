@@ -19,14 +19,23 @@ import random
 import sys
 
 
+class RandomizeitorError(Exception):
+    pass
+
+
 class Randomizeitor(object):
     """Sets a new random wallpaper in GNOME picking it from a given
     collection and taken care not to repeat twice."""
 
     def __init__(self, wallpaper_dir):
+        self._check_directory(wallpaper_dir)
         self._client = gconf.client_get_default()
         self.wallpaper_dir = wallpaper_dir
         self.already_picked = os.path.abspath(os.path.join(wallpaper_dir, '.randomizeitor'))
+
+    def _check_directory(self, wallpaper_dir):
+        if not os.path.isdir(wallpaper_dir):
+            raise RandomizeitorError(u"%s is not a directory" % wallpaper_dir)
 
     def get_current_wallpaper(self):
         return self._client.get_string("/desktop/gnome/background/picture_filename")
