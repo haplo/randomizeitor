@@ -76,6 +76,9 @@ class Randomizeitor(object):
         return files
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print "Usage: python %s /path/to/wallpaper/directory/" % sys.argv[0]
+        sys.exit(0)
     wallpaper_dir = sys.argv[1]
     client = Randomizeitor(wallpaper_dir)
     client.set_random_wallpaper()
