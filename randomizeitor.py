@@ -40,6 +40,7 @@ class Randomizeitor(object):
         candidate_wallpapers = self.get_candidate_wallpapers()
         the_chosen_one = random.choice(candidate_wallpapers)
         self.set_wallpaper(the_chosen_one)
+        return the_chosen_one
 
     def _remember_wallpaper(self, wallpaper):
         datafile = open(self.already_picked, "a")
@@ -81,4 +82,6 @@ if __name__ == '__main__':
         sys.exit(0)
     wallpaper_dir = sys.argv[1]
     client = Randomizeitor(wallpaper_dir)
-    client.set_random_wallpaper()
+    chosen_wallpaper = client.set_random_wallpaper()
+    print "New wallpaper! %s" % chosen_wallpaper
+    sys.exit(0)
