@@ -27,8 +27,15 @@ Randomizeitor will filter the files to select only images. Also, randomizeitor
 writes a *.randomizeitor* hidden file in the wallpaper dir to remember which
 wallpapers have already been picked, to avoid repetitions.
 
-You can use *gnome-schedule* or a cron job for periodic random wallpaper
-changes.
+The best way to set up a periodic random wallpaper change is to edit your
+crontab with ``crontab -e`` and then putting something like::
+
+  */5 * * * * bash -c "DISPLAY=:0.0 /(...)/randomizeitor.py /(...)/wallpapers/"
+
+This will trigger a random wallpaper change every 5 minutes. ``DISPLAY=:0.0`` is
+required because *cron* doesn't have information about your X session. The value
+of ``DISPLAY`` may vary if you are not in the first graphical session in the
+machine.
 
 If you only want a wallpaper change at GNOME start you can set it up at
 *System->Preferences->Startup Programs*.
