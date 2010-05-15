@@ -52,6 +52,7 @@ Future features
 In no particular order:
 
  * Allow for recursive search of files.
+ * Allow for different wallpapers if there are multiple screens.
  * Config file.
  * Create a GNOME applet.
  * Useful GUI.
