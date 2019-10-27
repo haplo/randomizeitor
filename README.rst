@@ -1,5 +1,7 @@
-Randomizeitor
-=============
+Randomizeitor (deprecated)
+==========================
+
+**Randomizeitor is DEPRECATED, it hasn't been updated in a very long time and is not expected to currently work**.
 
 Randomizeitor is a simple GNOME wallpaper randomizer created by Fidel Ramos (aka
 haplo) because, shockingly, there wasn't anything up to the task already. Sure,
